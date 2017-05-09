@@ -1,23 +1,51 @@
-"-------------Pathogen-------------------------------
-"for Pathogen plugin bundler
-execute pathogen#infect()
+"-------------START-------------------------------
 syntax on
 filetype plugin indent on
+let mapleader = "\<space>"
 
-"-------------Powerline-------------------------
-"add run time path to .vim for pathogen
-set rtp+=C:\\Program\ Files\ (x86)\\Vim\\vim74\\bundle\\powerline-develop\\powerline\\bindings\\vim
+"-------------Airline-----------------------------
+let g:airline_powerline_fonts = 1
+set enc=utf-8
+set guifont=Powerline_Consolas:h9:cANSI
+let g:airline_theme = "bubblegum"
 
-" Always display the statusline in all windows
+"remove file encoding
+let g:airline_section_y = ''
+
+"remove filetype
+let g:airline_section_x = ''
+
+"show status bar on all buffers
 set laststatus=2
 
-" Hide the default mode text (e.g. -- INSERT -- below the statusline)
+"don't show mode since airline
 set noshowmode
 
+"------------Syntastic--------------------------
+"1: auto open 0 auto close
+let g:syntastic_auto_loc_list=1
+let g:syntastic_python_checkers=['']
+
+"too sloww: make passive to prevent checks after writes
+let g:syntastic_check_on_open=0
+let g:syntastic_loc_list_height=8
+let g:syntastic_mode_map = {
+        \ "mode": "passive"}
+"let g:syntastic_debug = 1
+
 "-----------Ag Surfer --------------------------
+let g:ag_prg="ag -p C:/Users/franey/global.gitignore --vimgrep --smart-case"
+
 "Silver Surfer directory is project root
 let g:ag_working_path_mode="r"
 
+nnoremap <leader>ag :Grepper -tool ag<CR>
+
+"let g:grepper = {
+"    \ 'tools': ['ag', 'git', 'grep'],
+"    \ 'open':  0,
+"    \ 'jump':  1,
+"    \ }
 "------------CtrlP------------------------------
 "can change working path directory     ----might be 0 instead of rw. unsure.
 let g:ctrlp_working_path_mode = 'rw'
@@ -39,8 +67,7 @@ set tags =./tags;C:/git/common/ants/fixed/ants/tags
 
 "------------Rebinds----------------------------
 "d no longer yanks, remap to black hole register
-nnoremap dd "_dd
-vnoremap dd "_dd
+nnoremap d "_d
 
 "x no longer yanks, remap to black hole register
 nnoremap x "_x
@@ -63,17 +90,23 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
-"-----------Leaders-----------------------------
-let mapleader = "\<space>"
+"center buffer when jumping around functions
+nnoremap ]] ]]zz
+nnoremap [[ [[zz
 
+"Y yanks till end of line
+nnoremap Y y$
+
+"don't open first file in quicklist for these functions
+ca Ag Ag!
+ca Glog Glog!
+
+"-----------Leaders-----------------------------
 "quit preserves windows
 nnoremap <Leader>q :bp<CR>:bd #<CR>
 
 "open VIMRC
 nnoremap <Leader>$ :e $MYVIMRC<CR>
-
-"open directory     ---Not working yet
-nnoremap <leader>o :call OpenDir()
 
 "update tags
 nnoremap <leader>] :call UpdateTags()<CR>
@@ -96,26 +129,55 @@ nnoremap <leader>+ :vertical resize +5<CR>
 nnoremap <leader>- :vertical resize -5<CR>
 
 "grep for word under cursor
-nnoremap <leader>* :Ag! -Q <C-r>=expand('<cword>')<CR><CR>
+"nnoremap <leader>* :Grepper -tool ag -cword -noprompt<cr>
+"not producing accurate results like Ag
+"probably want to update path to be $HOME when I have time
+nnoremap <leader>* :Ag! -Q <C-r>=expand('<cword>') <CR><CR>
 
 "Ctrl-P search buffers
 nnoremap<leader>ls :CtrlPBuffer<CR>
 
-"visual block select variable names and sort lines
-vnoremap<leader>s :sort /\s\+/<CR>
+"run code checker
+nnoremap<leader>cc :call CodeCheck()<CR><CR>
+
+"run code complexity checker
+nnoremap<leader>co :call CodeComplexity()<CR><CR>
+
+"go to line number in code checker
+nnoremap<leader>gf :call CCGoToLine()<CR>
 
 "jump to requirement
-"nnoremap <leader>r :GarminJumpToRequirement
-" not working yet
-"g:garmin_requiem_exe = C:\\starteam\\Aviation\\Tools\\Requiem.exe"
+let g:garmin_requiem_exe = "C:\\starteam\\Aviation\\Tools\\Requiem.exe"
+nnoremap<leader>r :GarminJumpToRequirement<CR>
+
+"create file in current dir
+map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+
+"write file in current dir
+map <Leader>w :w <C-R>=expand("%:p:h") . "/" <CR>
+
+"run syntastic
+nnoremap <leader>sq :SyntasticToggleMode<CR>
+nnoremap <leader>sc :SyntasticCheck<CR>
+
+"yank relative path of current file
+noremap <silent> <leader>% :let @"=expand("%:h")<CR>
+
+"call IWYU
+noremap <leader>i :call IWYU()<CR>
 
 
 "-----------editor setting ---------------------
 set background=dark
 colorscheme solarized
-set guifont=Consolas:cANSI
 set guioptions-=T  "remove toolbar
 set guioptions-=m  "remove menu
+set guioptions-=r  "remove right scrollbar
+set guioptions-=l  "remove left scrollbar
+set guioptions-=L  "remove left scrollbar during vsp
+set guioptions+=c  "use console dialogs
+set guioptions+=e  "for tab label
+set guitablabel=% "set tab label"
 
 "remove annoying background highlighting for matching paren
 hi MatchParen guibg=NONE guifg=red
@@ -172,7 +234,13 @@ set backspace=indent,eol,start
 "don't wrap text on next line
 set nowrap
 
-"------------augroups/autocmnds-----------------
+"relative lines
+set relativenumber
+
+"don't redraw window during macro execution to increase speed
+set lazyredraw
+
+"------------augroups/autocmnds/commands--------
 "ensures autocmds are only applied once
 "clear all autocommands for current group
 "implement delete trailing write spaces
@@ -184,32 +252,21 @@ augroup configgroup
     autocmd BufWritePre Filetype c,cpp,python,jam :UpdateCopyright
 augroup END
 
-"----------custom functions---------------------
-"update tags files
-function! DelTagOfFile(file)
-  let fullpath = a:file
-  let cwd = getcwd()
-  let tagfilename = cwd . "/tags"
-  let f = substitute(fullpath, cwd . "/", "", "")
-  let f = escape(f, './')
-  let cmd = 'sed -i "/' . f . '/d" "' . tagfilename . '"'
-  let resp = system(cmd)
-endfunction
+"execute argument in cmd.exe from cwd
+command! -nargs=* Start execute 'silent !start cmd /k ' . "<args>"
 
+"open dir
+command! -nargs=1 OpenDir call OpenDir(<args>)
+
+"----------custom functions---------------------
+"update tags
 function! UpdateTags()
   let f = expand("%:p")
   let cwd = getcwd()
   let tagfilename = cwd . "/tags"
-  let cmd = 'ctags -a -R -f' . tagfilename . ' --exclude=bin --c++-kinds=+p --fields=+iaS --extra=+q ' . '"' . f . '"'
-  call DelTagOfFile(f)
+  call delete(tagfilename)
+  let cmd = 'ctags ' . '-a -B -R -f ' . tagfilename . ' --exclude=bin --c++-kinds=+p --fields=+iaS --extra=+q '
   let resp = system(cmd)
-endfunction
-
-function! AddAntsTags()
-   "refresh ants tags and add tags file to tags
-   "set tags ./tags;C:/git/common/ants/fixed/ants/tags
-   "let dir = C:/git/common/ants/fixed/ants
-   "let cmd = 'ctags -a -R -f' . tagfilename . ' --python-kinds=i --c++-kinds=+p --fields=+iaS --extra=+q ' . '"' . f . '"'
 endfunction
 
 "open specified directory in new tab and refresh ctags
@@ -221,11 +278,7 @@ function! OpenDir(dir)
     execute 'cd ' . newdir
     execute 'Ex | winc l'
     execute 'cd ' . newdir
-    execute 'split'
-    execute 'Ex | winc j'
-    execute 'cd ' . newdir
     execute 'Ex | winc h | winc h'
-    call UpdateTags()
 endfunction
 
 function! OpenModTest()
@@ -236,38 +289,64 @@ function! OpenModTest()
     execute "\<CR>"
 endfunction
 
-function! GetDir()
-  let curline = getline('.')
-  call inputsave()
-  let name = input('Enter name: ')
-  call inputrestore()
-  call setline('.', curline . ' ' . name)
+function! CodeCheck()
+    set makeprg=python.exe
+    set errorformat=%f!%l!%m
+    exe ':make!' getcwd() . "\\support\\tools\\code-check\\code_check.py " . expand("%:p")
+    botright copen
 endfunction
 
-"function! HexConv()
-"    let prev_yank = @"
-"    normal yiw
-"    let hex_val = @"
-"    let len= strlen(hex_val)
-"    let hex_str = ""
-"    if len % 2 != 0
-"        echo "not valid hex"
-"    endif
-"    i=0
-"    while i < len
-"        if i % 2 == 0
-"            let hex_str = "\x" . hex_val[i] . hex_val[i+1] . hex_str
-"        endif
-"        i += 1
-"    endwhile
-"        echo hex_str
-"endfunction
-function! SortHeaders()
-    normal gg
-    execute "normal /#include\<CR>v/\n\n\<CR>kk$"
-    execute "'<,'>sort"
-    execute "normal /\n\n\<CR>"
-    execute "normal /#include\<CR>v/\n\n\<CR>kk$"
-    execute "'<,'>sort"
+function! CodeComplexity()
+    set makeprg=python.exe
+    set errorformat=%f!%l!%m
+    exe ':make!' 'D:/giaw/Tools/CodeComplexityCheck/code_complexity_check.py ' . expand("%:p")
+    botright copen
 endfunction
+
+function! CCGoToLine()
+    "search for 'Line'
+    execute "normal 0/Line\<cr>"
+    "yank line number
+    execute 'normal w"zyiw0'
+    "go to previous window
+    execute "normal \<c-w>\<c-p>"
+    "jump to yanked line number
+    execute "normal :\<c-r>z\<cr>"
+endfunction
+
+"run IWYU on current file
+function IWYU()
+    execute 'silent !start cmd /k "iwyu.sh -f " %'
+endfunction
+
+""setup default diff expression for windows
+set diffexpr=MyDiff()
+function! MyDiff()
+   let opt = '-a --binary '
+   if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+   if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+   let arg1 = v:fname_in
+   if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+   let arg2 = v:fname_new
+   if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+   let arg3 = v:fname_out
+   if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+   if $VIMRUNTIME =~ ' '
+     if &sh =~ '\<cmd'
+       if empty(&shellxquote)
+         let l:shxq_sav = ''
+         set shellxquote&
+       endif
+       let cmd = '"' . $VIMRUNTIME . '\diff"'
+     else
+       let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+     endif
+   else
+     let cmd = $VIMRUNTIME . '\diff'
+   endif
+   silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+   if exists('l:shxq_sav')
+     let &shellxquote=l:shxq_sav
+   endif
+ endfunction
 
