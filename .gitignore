@@ -1,0 +1,6 @@
+#ignore everything but vimrc and getplug.sh
+*
+*/*
+!vimrc
+!getplug.sh
+!.gitignore
