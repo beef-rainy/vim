@@ -1,352 +1,392 @@
-"-------------START-------------------------------
-syntax on
-filetype plugin indent on
-let mapleader = "\<space>"
+"-------------START------------------------------- 
+syntax on filetype plugin indent on 
+let mapleader = "\ " 
+set nocompatible 
 
-"-------------Airline-----------------------------
-let g:airline_powerline_fonts = 1
-set enc=utf-8
-set guifont=Powerline_Consolas:h9:cANSI
-let g:airline_theme = "bubblegum"
+"--------------PLUG ----------------------------- 
+call plug#begin('~/vimfiles/plugged')
 
-"remove file encoding
-let g:airline_section_y = ''
+Plug 'kien/ctrlp.vim'
+Plug 'jremmen/vim-ripgrep'
+Plug 'ludovicchabant/vim-gutentags'
 
-"remove filetype
-let g:airline_section_x = ''
+call plug#end()
 
-"show status bar on all buffers
-set laststatus=2
+"--------------Ale ----------------------------- 
+let g:ale_set_highlights = 1 
+let g:ale_linters = {'c': ['flint'] } 
+let g:ale_enabled = 0 
 
-"don't show mode since airline
-set noshowmode
+"-----------RipGrep-------------------------- 
+let g:rg_command = 'rg --smart-case --ignore-file C:/Users/wfraney/global.gitignore --vimgrep' 
+"statusline settings
+set statusline= 
+set statusline+=\ %f "file name 
+set statusline+=%m "modified file? [+]
+set statusline+=%= "go to right side of statusline 
+set statusline+=\ %l/%L "line out of max lines 
+set statusline+=\ %3p%% "percentage of file 
+set statusline+=\ %3c "column set statusline+=\ " 
 
-"------------Syntastic--------------------------
-"1: auto open 0 auto close
-let g:syntastic_auto_loc_list=1
-let g:syntastic_python_checkers=['']
-
-"too sloww: make passive to prevent checks after writes
-let g:syntastic_check_on_open=0
-let g:syntastic_loc_list_height=8
-let g:syntastic_mode_map = {
-        \ "mode": "passive"}
-"let g:syntastic_debug = 1
-
-"-----------Ag Surfer --------------------------
-let g:ag_prg="ag -p C:/Users/franey/global.gitignore --vimgrep --smart-case"
-
-"Silver Surfer directory is project root
-let g:ag_working_path_mode="r"
-
-nnoremap <leader>ag :Grepper -tool ag<CR>
-
-"let g:grepper = {
-"    \ 'tools': ['ag', 'git', 'grep'],
-"    \ 'open':  0,
-"    \ 'jump':  1,
-"    \ }
-"------------CtrlP------------------------------
-"can change working path directory     ----might be 0 instead of rw. unsure.
-let g:ctrlp_working_path_mode = 'rw'
-
-"Use Ag to find since it is so gloriously fast.
-if executable('ag')
-  let g:ctrlp_user_command = 'ag -l --nocolor -g "" %s'
-  let g:ctrlp_use_caching = 0
+"------------CtrlP------------------------------ 
+"can change working path directory ----might be 0 instead of rw. unsure. 
+let g:ctrlp_working_path_mode = '0' 
+let g:ctrlp_by_filename = 1 
+let g:ctrlp_match_window = 'bottom,ttb,min:1,max:25,results:25' 
+"stopped working when moved pack to vimfiles 
+"let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' } 
+"use the HOTTEST new file searcher: ripgrep 
+if executable('rg') 
+  set grepprg=rg\ --color=never 
+  let g:ctrlp_user_command = 'rg %s --files --ignore-file C:/Users/franey/search.gitignore --color=never --glob ""' 
+  let g:ctrlp_use_caching = 0 
 endif
 
-"Actually map to <c-p>
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
+"Actually map to ctrl p
+let g:ctrlp_map = '<c-p>' 
+let g:ctrlp_cmd = 'CtrlP' 
 
-"-----------C Tags------------------------------
-"look for tags file in current directory first
-set tags =./tags;C:/git/common/ants/fixed/ants/tags
-"^^^unsure if working properly
+"remove CtrlP statusline 
+let g:ctrlp_buffer_func = { 'enter': 'Status1', 'exit': 'Status2', } 
 
-"------------Rebinds----------------------------
-"d no longer yanks, remap to black hole register
-nnoremap d "_d
+func! Status1() 
+   set laststatus=0 
+endfunc 
 
-"x no longer yanks, remap to black hole register
-nnoremap x "_x
-vnoremap x "_x
+func! Status2() 
+  set laststatus=2
+endfunc 
 
-"enable shift tab in insert mode
-inoremap <S-Tab> <C-d>
+"------------Gutentags------------------------------ 
+"let g:gutentags_exclude_project_root=["./bin/", ".\bin\"./lib/boost/"] 
+"let g:gutentags_project_root_finder='Guten_root_fndr' 
+"let g:gutentags_add_default_project_roots=0 
+"let g:gutentags_ctags_extra_args=['-B', '--fields=+iaS', '--extra=+q' ] 
+let g:gutentags_generate_on_empty_buffer=1 
+let g:gutentags_define_advanced_commands=1 
+let g:gutentags_enabled=1
+"function! Guten_root_fndr(filepath) 
+"   return getcwd() 
+"endfunction
 
-"jk and kj map to <ESC> to normal mode
-inoremap jk <ESC>
-inoremap kj <ESC>
+"------------Rebinds---------------------------- 
+"d no longer yanks, remap to black hole register 
+"TODO:vim bug
+"noremap d "_d 
+"nnoremap D "_D 
+"vnoremap d "_d 
+"vnoremap D "_D 
+"
+""x no longer yanks, remap to black hole register 
+"nnoremap x "_x 
+"vnoremap x "_x 
 
-"go up and down visually in normal mode
-nnoremap j gj
-nnoremap k gk
+"jk and kj map to to normal mode 
+inoremap jk <esc>
+"TODO
+"tnoremap jk N 
 
-"Better window navigation
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-h> <C-w>h
-nnoremap <C-l> <C-w>l
+"go up and down visually in normal mode 
+"nnoremap j gj
+"nnoremap k gk
+"TODO ^^^
 
-"center buffer when jumping around functions
-nnoremap ]] ]]zz
-nnoremap [[ [[zz
+"terminal escape
+tnoremap <esc> <c-\><c-n>
+tnoremap jk <c-\><c-n>
 
-"Y yanks till end of line
-nnoremap Y y$
+"Better window navigation 
+nnoremap <C-j> <C-W>j
+nnoremap <C-k> <C-W>k
+nnoremap <C-l> <C-W>l
+nnoremap <C-h> <C-W>h
+"TODO
+"tnoremap j
+"tnoremap k 
+"tnoremap h 
+"tnoremap l 
 
-"don't open first file in quicklist for these functions
+"center buffer when jumping around functions 
+nnoremap ]] ]]zz 
+nnoremap [[ [[zz 
+
+"Y yanks till end of line 
+nnoremap Y y$ 
+
+"don't open first file in quicklist for these functions 
 ca Ag Ag!
 ca Glog Glog!
 
-"-----------Leaders-----------------------------
-"quit preserves windows
-nnoremap <Leader>q :bp<CR>:bd #<CR>
+ "-----------Leaders----------------------------- 
+"open VIMRC 
+nnoremap <leader>$ :e $MYVIMRC<CR>
 
-"open VIMRC
-nnoremap <Leader>$ :e $MYVIMRC<CR>
+"update tags 
+nnoremap <leader>] :GutentagsUpdate! 
 
-"update tags
-nnoremap <leader>] :call UpdateTags()<CR>
+"yank and paste from system clipboard 
+nnoremap <leader>p "+p 
+noremap <leader>y "+y 
 
-"yank and paste from system clipboard
-nnoremap <leader>p "+p
-noremap <leader>y "+y
-
-"stop highlighting searches
+"stop highlighting searches 
 nnoremap <leader>/ :nohlsearch<CR>
 
-"go to build.jam
-nnoremap <leader>j :GarminBjamEdit()<CR>
+"grep for word under cursor 
+"nnoremap <leader>* :Rg --sort-files -F <c-r>=expand('<cword>') <CR><CR>
+nnoremap <leader>* :Rg --sort-files <c-r>=expand('<cword>') <CR><CR>
 
-"go to mod test
-nnoremap <leader>m :call OpenModTest()<CR>
+"Ctrl-P search buffers 
+nnoremap <leader>b :CtrlPBuffer<CR>
 
-"increase/decrease current window width
-nnoremap <leader>+ :vertical resize +5<CR>
-nnoremap <leader>- :vertical resize -5<CR>
+"Ctrl-P search functions in current file 
+nnoremap <leader>f :CtrlPFunky 
 
-"grep for word under cursor
-"nnoremap <leader>* :Grepper -tool ag -cword -noprompt<cr>
-"not producing accurate results like Ag
-"probably want to update path to be $HOME when I have time
-nnoremap <leader>* :Ag! -Q <C-r>=expand('<cword>') <CR><CR>
+"run code checker 
+"yank relative path of current file 
+noremap <leader>% :let @"=expand("%:h") 
 
-"Ctrl-P search buffers
-nnoremap<leader>ls :CtrlPBuffer<CR>
+"call IWYU 
+noremap <leader>i :call IWYU() 
 
-"run code checker
-nnoremap<leader>cc :call CodeCheck()<CR><CR>
+"toggle ALE on/off
+nnoremap <leader>a :call ALETog() 
 
-"run code complexity checker
-nnoremap<leader>co :call CodeComplexity()<CR><CR>
+"open Location List 
+nnoremap <leader>l :lope 
 
-"go to line number in code checker
-nnoremap<leader>gf :call CCGoToLine()<CR>
+"open terminal in bottom right 
+nnoremap <leader>t :botr term 
 
-"jump to requirement
-let g:garmin_requiem_exe = "C:\\starteam\\Aviation\\Tools\\Requiem.exe"
-nnoremap<leader>r :GarminJumpToRequirement<CR>
+"open dir snippet 
+nnoremap <leader>o :OpenDir(" nnoremap ]] :TagbarToggle <CR>
 
-"create file in current dir
-map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+"grep for word under cursor in header 
+nnoremap <leader>h :Rg =expand('') -th 
 
-"write file in current dir
-map <Leader>w :w <C-R>=expand("%:p:h") . "/" <CR>
+"-----------editor setting --------------------- 
+set background=light
+"set background=dark 
+set guioptions-=T 
+"remove toolbar set guioptions-=m 
+"remove menu 
+set guioptions-=r 
+"remove right scrollbar 
+set guioptions-=l 
+"remove left scrollbar 
+set guioptions-=L 
+"remove left scrollbar during vsp 
+set guioptions+=c 
+"use console dialogs 
+set guioptions+=e 
+"for tab label 
+set guitablabel=%N)\ %{GuiTabLabel()} 
+"tab number + custom tab label 
+set enc=utf-8 
+set guifont=Consolas:h11:cANSI
 
-"run syntastic
-nnoremap <leader>sq :SyntasticToggleMode<CR>
-nnoremap <leader>sc :SyntasticCheck<CR>
+if has("gui_running") 
+  " GUI is running or is about to start. 
+  " Maximize gvim window. 
+  set lines=999 columns=999 
+  colorscheme desert 
+else 
 
-"yank relative path of current file
-noremap <silent> <leader>% :let @"=expand("%:h")<CR>
+  "This is console Vim. 
+  colorscheme desert 
+  "arcane settings to get block cursor for normal mode 
+  let &t_ti.="\e[1 q"
+  let &t_SI.="\e[5 q" 
+  let &t_EI.="\e[1 q" 
+  let &t_te.="\e[0 q" 
+endif 
 
-"call IWYU
-noremap <leader>i :call IWYU()<CR>
+"remove annoying background highlighting for matching paren 
+hi MatchParen guibg=NONE guifg=red 
 
+"change highlight color so you can actually see the cursor 
+hi Search guifg=DarkCyan 
+hi IncSearch guifg=DarkRed 
 
-"-----------editor setting ---------------------
-set background=dark
-colorscheme solarized
-set guioptions-=T  "remove toolbar
-set guioptions-=m  "remove menu
-set guioptions-=r  "remove right scrollbar
-set guioptions-=l  "remove left scrollbar
-set guioptions-=L  "remove left scrollbar during vsp
-set guioptions+=c  "use console dialogs
-set guioptions+=e  "for tab label
-set guitablabel=% "set tab label"
+"maximize window (removing menu leaves a little extra space) 
+autocmd GUIEnter * simalt ~x 
 
-"remove annoying background highlighting for matching paren
-hi MatchParen guibg=NONE guifg=red
+"case insensitive searching 
+set ignorecase 
 
-"change highlight color so you can actually see the cursor
-hi Search guifg=DarkCyan
-hi IncSearch guifg=DarkRed
+"become case sensitive when a capital is typed 
+set smartcase 
 
-"initialize windows for console vim or gvim
-if has("gui_running")
-  " GUI is running or is about to start.
-  " Maximize gvim window.
-  set lines=999 columns=999
-else
-  " This is console Vim.
-  if exists("+lines")
-    set lines=50
-  endif
-  if exists("+columns")
-    set columns=100
-  endif
-endif
+"replace all tabs with spaces 
+set expandtab 
 
-"maximize window (removing menu leaves a little extra space)
-autocmd GUIEnter * simalt ~x
+"read files with tabs as 4 spaces 
+set softtabstop=2 
 
-"case insensitive searching
-set ignorecase
+"number of spaces to move in an autoindent 
+set shiftwidth=2
 
-"become case sensitive when a capital is typed
-set smartcase
+"search while typing in search query 
+set incsearch 
 
-"replace all tabs with spaces
-set expandtab
+"highlight searches 
+set hlsearch 
 
-"read files with tabs as 4 spaces
-set softtabstop=4
+"make backspace work like normal programs 
+set backspace=indent,eol,start 
 
-"number of spaces to move in an autoindent
-set shiftwidth=4
+"don't wrap text on next line 
+set nowrap 
 
-"show line numbers
-set number
+"don't redraw window during macro execution to increase speed 
+set lazyredraw 
 
-"search while typing in search query
-set incsearch
+"ignore files during file/dir completion 
+set wildignore+=*/.git/* 
 
-"highlight searches
-set hlsearch
+"faster key timeout 
+set ttimeoutlen=50 
 
-"make backspace work like normal programs
-set backspace=indent,eol,start
+"allow indenting of some c commands 
+set cindent 
 
-"don't wrap text on next line
-set nowrap
+"'if' brace indenting is 1 shiftwidth 
+set cinoptions={1s 
 
-"relative lines
-set relativenumber
+"start in col 0 after brace in col 0 
+set cinoptions+=^-1s 
 
-"don't redraw window during macro execution to increase speed
-set lazyredraw
+" This should make the text for comment blocks
+" start on the same column as the slash / 
+set cinoptions+=c0,C1 
+
+" This should have multi-line conditionals to start 
+" on the column after the ( 
+set cinoptions+=(0,u0,w1 
+
+"set 'normal' shifting 
+set cinoptions+=>1s 
+
+"remove indent after o and O 
+"set cinkeys-=o,O 
+"add newline at end of file set eol 
+"do not unload buffer when it is left 
+set hidden 
+
+"remove some paths to speed up find ( find currently so slow it's unusable ) 
+set wildignore+=*/bin/** 
+set wildignore+=*/support/** 
+set wildignore+=*/sim/** 
+
+"make normal mode commands like 'w' respect path delimiter "/" "sometimes i want to yank just the file name, not whole path 
+set iskeyword-=/ 
 
 "------------augroups/autocmnds/commands--------
-"ensures autocmds are only applied once
-"clear all autocommands for current group
-"implement delete trailing write spaces
-"set python comments to '#' (implement later)
-augroup configgroup
-    autocmd!
-    autocmd BufWritePre *.h,*.py,*.jam,*.c :%s/ \+$//ge
-    autocmd FileType python setlocal commentstring=#\ %s
-    autocmd BufWritePre Filetype c,cpp,python,jam :UpdateCopyright
-augroup END
+"ensures autocmds are only applied once 
+"clear all autocommands for current group 
+"implement delete trailing write spaces 
+"set python comments to '#' (implement later) 
+augroup configgroup 
+"delete all autocommands when sourcing vimrc autocmd! 
+    autocmd BufWritePre *.h,*.py,*.jam,*.c :%s/ \+$//ge 
+    autocmd FileType python setlocal commentstring=#\ %s 
+    autocmd FileType *.c, *.h setlocal spell 
+    autocmd BufEnter ControlP let b:ale_enabled = 0 
+    autocmd TabEnter * :call UpdatePath() 
+    "close quickfix whenever I select an option 
+    "autocmd FileType qf nnoremap :cclose 
+augroup END 
 
-"execute argument in cmd.exe from cwd
-command! -nargs=* Start execute 'silent !start cmd /k ' . "<args>"
+"execute argument in cmd.exe from cwd 
+command! -nargs=* Start execute 'silent !start cmd /k ' . ""
 
-"open dir
-command! -nargs=1 OpenDir call OpenDir(<args>)
+"open dir 
+command! -nargs=1 OpenDir call OpenDir() 
 
-"----------custom functions---------------------
+"update tags every 1000 minutes 
+"let temptmr = timer_start(60000000,'UpdateTags', {'repeat':-1}) 
+"generate help tags 
+"helptags $VIMRUNTIME 
+
+"----------custom functions--------------------- "
 "update tags
-function! UpdateTags()
-  let f = expand("%:p")
-  let cwd = getcwd()
-  let tagfilename = cwd . "/tags"
-  call delete(tagfilename)
-  let cmd = 'ctags ' . '-a -B -R -f ' . tagfilename . ' --exclude=bin --c++-kinds=+p --fields=+iaS --extra=+q '
-  let resp = system(cmd)
-endfunction
+function! UpdateTags(timer_id) 
+    let cwd = getcwd() 
+    "let tagfilename = cwd . "\\tags" 
+    "call delete(tagfilename) 
+"let cmd = 'ctags ' . '-B -R -f ' . tagfilename . ' --exclude=bin --exclude=.\lib\boost --fields=+iaS --extra=+q ' "execute 'term ' . cmd let tagfilename = cwd . "\\tags_h" 
+   call delete(tagfilename) 
+let cmd = 'ctags ' . '-B -R -f ' . tagfilename . ' --exclude=bin --exclude=.\lib\boost,*.c --fields=+iaS --c++-kinds=p --extra=+q ' execute 'term++close ' . cmd 
+endfunction 
 
-"open specified directory in new tab and refresh ctags
+function! UpdateTags(timer_id) 
+	let cwd = getcwd() 
+	let tagfilename = cwd . "\\tags" 
+	call delete(tagfilename) 
+	let cmd = 'ctags ' . '-B -R -f ' . tagfilename . ' --exclude=bin --exclude=.\lib\boost --fields=+iaS --extra=+q ' "execute 'term ' . cmd "
+	let tagfilename = cwd . '\\tags_h' "
+	call delete(tagfilename) 
+	"let cmd = 'ctags ' . '-B -R -f ' . tagfilename . ' --exclude=bin --exclude=.\lib\boost,*.c --fields=+iaS --c++-kinds=p --extra=+q ' execute 'term++close ' . cmd 
+endfunction 
+
+"open specified directory in new tab and refresh ctags 
 function! OpenDir(dir)
-    let newdir="D:/git/" . a:dir
-    execute 'tabnew | vsplit | vsplit | winc ='
-    execute 'cd ' . newdir
-    execute 'Ex | winc l'
-    execute 'cd ' . newdir
-    execute 'Ex | winc l'
-    execute 'cd ' . newdir
-    execute 'Ex | winc h | winc h'
-endfunction
-
-function! OpenModTest()
-    let file = expand('%:t')
-    let mod_test = "mod_test_" . file
-    execute 'Ag '. mod_test
-    execute "/src"
-    execute "\<CR>"
+   "Tabenter won't warm the cache since when we enter the tab we are still 
+   "the old cwd. This signal prevents a grep on tabenter and we do one at 
+   "the bottom of this function with the new cwd. 
+   "let g:dir_opened = 1 
+   let newdir="D:/git/" . a:dir 
+  execute 'tabnew | vsplit | vsplit | winc =' 
+  execute 'cd ' . newdir 
+  execute 'Ex | winc l' 
+  execute 'cd ' . newdir 
+  execute 'Ex | winc l' 
+  execute 'cd ' . newdir 
+  execute 'Ex | winc h | winc h' 
+  "Warm the cache 
+  "execute ":AsyncRun Rg iop>log.txt" 
 endfunction
 
 function! CodeCheck()
-    set makeprg=python.exe
-    set errorformat=%f!%l!%m
-    exe ':make!' getcwd() . "\\support\\tools\\code-check\\code_check.py " . expand("%:p")
-    botright copen
-endfunction
-
+ set makeprg=python.exe set errorformat=%f!%l!%m exe ':make!' getcwd() . "\\support\\tools\\common_scripts\\cconventions\\code_check.py " . expand("%:p") botright copen endfunction
 function! CodeComplexity()
-    set makeprg=python.exe
-    set errorformat=%f!%l!%m
-    exe ':make!' 'D:/giaw/Tools/CodeComplexityCheck/code_complexity_check.py ' . expand("%:p")
-    botright copen
+  set makeprg=python.exe 
+  set errorformat=%f!%l!%m 
+  exe ':make!' 'D:/giaw/Tools/CodeComplexityCheck/code_complexity_check.py ' . expand("%:p")
+  botright copen
 endfunction
+"run IWYU on current file 
+function! 
+   IWYU() let l:temp_file = substitute( expand("%"), "\\", "/", "g" ) execute 'silent !start sh -c \"./iwyu2.sh ' . l:temp_file . '"' 
 
-function! CCGoToLine()
-    "search for 'Line'
-    execute "normal 0/Line\<cr>"
-    "yank line number
-    execute 'normal w"zyiw0'
-    "go to previous window
-    execute "normal \<c-w>\<c-p>"
-    "jump to yanked line number
-    execute "normal :\<c-r>z\<cr>"
-endfunction
+  "old git bash compatible command 
+  "execute 'silent !start cmd /k "iwyu2.sh " % --max_line_length=200' 
+endfunction 
 
-"run IWYU on current file
-function IWYU()
-    execute 'silent !start cmd /k "iwyu.sh -f " %'
-endfunction
+"setup default diff expression for windows 
+set diffexpr=MyDiff() 
 
-""setup default diff expression for windows
-set diffexpr=MyDiff()
-function! MyDiff()
-   let opt = '-a --binary '
-   if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-   if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-   let arg1 = v:fname_in
-   if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-   let arg2 = v:fname_new
-   if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-   let arg3 = v:fname_out
-   if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-   if $VIMRUNTIME =~ ' '
-     if &sh =~ '\<cmd'
-       if empty(&shellxquote)
-         let l:shxq_sav = ''
-         set shellxquote&
-       endif
-       let cmd = '"' . $VIMRUNTIME . '\diff"'
-     else
-       let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-     endif
-   else
-     let cmd = $VIMRUNTIME . '\diff'
-   endif
-   silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
-   if exists('l:shxq_sav')
-     let &shellxquote=l:shxq_sav
-   endif
- endfunction
+function! SortUniqQFList()
+   let sortedList = sort(getqflist(), 's:CompareQuickfixEntries')
+   call setqflist(sortedList)
+endfunction 
 
+function! ShowFunc()
+  let gf_s = &grepformat 
+  let gp_s = &grepprg 
+  let &grepformat = '%*\k%*\sfunctions%*\s%l%*\s%f %*\s%m'
+  let &grepprg = 'ctags -x --c-types=f --sort=no -o -' write 
+  "replace backslash in file with 2 backslashed for searching 
+  let l:temp_file = substitute( expand("%"), "\\", "\\\\\\", "g" )
+  echo l:temp_file 
+  execute ":grep " . l:temp_file 
+  let &grepformat = gf_s let &grepprg = gp_s 
+endfunc
+
+function! ALETog()
+  execute ":lclo" 
+  execute ":ALEToggle" 
+endfunc 
+
+function! UpdatePath()
+  let &path = getcwd() . '/**' 
+endfunc 
