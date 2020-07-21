@@ -3,23 +3,25 @@ syntax on filetype plugin indent on
 let mapleader = "\ " 
 set nocompatible 
 
+"--------------OS ----------------------------- 
+if !exists('g:os')
+  if has('win32') || has('win16') || has ('win64')
+    let g:os = 'Windows'
+    let g:vim_folder ='~/vimfiles/'
+  else 
+    let g:os = substitute(system('uname'), '\n', '', '')
+    let g:vim_folder ='~/.vim/'
+  endif
+endif
+
 "--------------PLUG ----------------------------- 
-call plug#begin('~/vimfiles/plugged')
+call plug#begin(g:vim_folder . '/plugged')
 
 Plug 'kien/ctrlp.vim'
 Plug 'jremmen/vim-ripgrep'
 Plug 'ludovicchabant/vim-gutentags'
 
 call plug#end()
-
-"--------------OS ----------------------------- 
-if !exists('g:os')
-  if has('win32') || has('win16') || has ('win64')
-    let g:os = 'Windows'
-  else 
-    let g:os = substitude(system('uname'), '\n', '', '')
-  endif
-endif
 
 "--------------Ale ----------------------------- 
 let g:ale_set_highlights = 1 
@@ -80,14 +82,14 @@ let g:gutentags_enabled=1
 
 "------------Rebinds---------------------------- 
 "d no longer yanks, remap to black hole register 
-noremap d "_d 
-nnoremap D "_D 
-vnoremap d "_d 
-vnoremap D "_D 
+"noremap d "_d 
+"nnoremap D "_D 
+"vnoremap d "_d 
+"vnoremap D "_D 
 "
 ""x no longer yanks, remap to black hole register 
-"nnoremap x "_x 
-"vnoremap x "_x 
+nnoremap x "_x 
+vnoremap x "_x 
 
 "jk and kj map to to normal mode 
 inoremap jk <esc>
