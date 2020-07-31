@@ -71,7 +71,7 @@ endfunc
 "------------Gutentags------------------------------ 
 "let g:gutentags_exclude_project_root=["./bin/", ".\bin\"./lib/boost/"] 
 "let g:gutentags_project_root_finder='Guten_root_fndr' 
-"let g:gutentags_add_default_project_roots=0 
+let g:gutentags_add_default_project_roots=1
 "let g:gutentags_ctags_extra_args=['-B', '--fields=+iaS', '--extra=+q' ] 
 let g:gutentags_generate_on_empty_buffer=1 
 let g:gutentags_define_advanced_commands=1 
@@ -88,8 +88,8 @@ let g:gutentags_enabled=1
 "vnoremap D "_D 
 "
 ""x no longer yanks, remap to black hole register 
-nnoremap x "_x 
-vnoremap x "_x 
+"nnoremap x "_x 
+"vnoremap x "_x 
 
 "jk and kj map to to normal mode 
 inoremap jk <esc>
@@ -227,10 +227,10 @@ set smartcase
 set expandtab 
 
 "read files with tabs as 4 spaces 
-set softtabstop=2 
+set softtabstop=4 
 
 "number of spaces to move in an autoindent 
-set shiftwidth=2
+set shiftwidth=4
 
 "search while typing in search query 
 set incsearch 
