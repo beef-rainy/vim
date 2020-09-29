@@ -38,6 +38,7 @@ set statusline+=%= "go to right side of statusline
 set statusline+=\ %l/%L "line out of max lines 
 set statusline+=\ %3p%% "percentage of file 
 set statusline+=\ %3c "column set statusline+=\ " 
+set laststatus=1 "always show statusline 
 
 "------------CtrlP------------------------------ 
 "can change working path directory ----might be 0 instead of rw. unsure. 
@@ -197,6 +198,15 @@ if has("gui_running")
   " Maximize gvim window. 
   set lines=999 columns=999 
   colorscheme desert 
+  "maximize window (removing menu leaves a little extra space) 
+  autocmd GUIEnter * simalt ~x 
+  "remove annoying background highlighting for matching paren 
+  hi MatchParen guibg=NONE guifg=red 
+  
+  "change highlight color so you can actually see the cursor 
+  hi Search guifg=DarkCyan 
+  hi IncSearch guifg=DarkRed 
+
 else 
   "This is console Vim. 
   colorscheme desert 
@@ -207,15 +217,6 @@ else
   let &t_te.="\e[0 q" 
 endif 
 
-"remove annoying background highlighting for matching paren 
-hi MatchParen guibg=NONE guifg=red 
-
-"change highlight color so you can actually see the cursor 
-hi Search guifg=DarkCyan 
-hi IncSearch guifg=DarkRed 
-
-"maximize window (removing menu leaves a little extra space) 
-autocmd GUIEnter * simalt ~x 
 
 "case insensitive searching 
 set ignorecase 
