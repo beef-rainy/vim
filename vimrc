@@ -29,7 +29,11 @@ let g:ale_linters = {'c': ['flint'] }
 let g:ale_enabled = 0 
 
 "-----------RipGrep-------------------------- 
-let g:rg_command = 'rg --smart-case --ignore-file C:/Users/wfraney/global.gitignore --vimgrep' 
+if g:os == 'Windows'
+    let g:rg_command = 'rg --smart-case --ignore-file ~/git/ignore --vimgrep' 
+else
+    let g:rg_command = 'rg --smart-case --ignore-file ~/.config/git/ignore --vimgrep' 
+endif 
 "statusline settings
 set statusline= 
 set statusline+=\ %f "file name 
@@ -102,8 +106,10 @@ nnoremap j gj
 nnoremap k gk
 
 "terminal escape
-tnoremap <esc> <c-\><c-n>
-tnoremap jk <c-\><c-n>
+if v:version >= 800
+    tnoremap <esc> <c-\><c-n>
+    tnoremap jk <c-\><c-n>
+endif
 
 "Better window navigation 
 nnoremap <C-j> <C-W>j
@@ -143,7 +149,11 @@ nnoremap <leader>/ :nohlsearch<CR>
 
 "grep for word under cursor 
 "nnoremap <leader>* :Rg --sort-files -F <c-r>=expand('<cword>') <CR><CR>
-nnoremap <leader>* :Rg --sort-files <c-r>=expand('<cword>') <CR><CR>
+if executable('rg') 
+    nnoremap <leader>* :Rg --sort-files <c-r>=expand('<cword>') <CR><CR>
+elseif executable('grep') 
+    nnoremap <leader>* :grep <cword> *<CR>
+endif 
 
 "Ctrl-P search buffers 
 nnoremap <leader>b :CtrlPBuffer<CR>
@@ -226,11 +236,11 @@ set smartcase
 
 "replace all tabs with spaces 
 set expandtab 
-
-"read files with tabs as 4 spaces 
+"
+""read files with tabs as 4 spaces 
 set softtabstop=4 
-
-"number of spaces to move in an autoindent 
+"
+""number of spaces to move in an autoindent 
 set shiftwidth=4
 
 "search while typing in search query 
@@ -298,6 +308,7 @@ augroup configgroup
     autocmd BufWritePre *.h,*.cpp,*.py,*.jam,*.c :%s/ \+$//ge 
     autocmd FileType python setlocal commentstring=#\ %s 
     autocmd FileType *.c, *.h setlocal spell 
+    autocmd FileType *.dtsi make set noexpandtab
     autocmd BufEnter ControlP let b:ale_enabled = 0 
     autocmd TabEnter * :call UpdatePath() 
     "close quickfix whenever I select an option 
