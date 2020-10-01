@@ -4,14 +4,14 @@ let mapleader = "\ "
 set nocompatible 
 
 "--------------OS ----------------------------- 
-if !exists('g:os')
-  if has('win32') || has('win16') || has ('win64')
+if has('win32') || has('win16') || has ('win64')
     let g:os = 'Windows'
     let g:vim_folder ='~/vimfiles/'
-  else 
+    let g:ignore_file ='~/git/ignore'
+else 
     let g:os = substitute(system('uname'), '\n', '', '')
     let g:vim_folder ='~/.vim/'
-  endif
+    let g:ignore_file ='~.config/git/ignore'
 endif
 
 "--------------PLUG ----------------------------- 
@@ -54,7 +54,7 @@ let g:ctrlp_match_window = 'bottom,ttb,min:1,max:25,results:25'
 "use the HOTTEST new file searcher: ripgrep 
 if executable('rg') 
   set grepprg=rg\ --color=never 
-  let g:ctrlp_user_command = 'rg %s --files --ignore-file C:/Users/franey/search.gitignore --color=never --glob ""' 
+  let g:ctrlp_user_command = 'rg %s --files --ignore-file ' . g:ignore_file . ' --color=never --glob ""' 
   let g:ctrlp_use_caching = 0 
 endif
 
